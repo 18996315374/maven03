@@ -8,8 +8,8 @@ import java.util.LinkedList;
 
 public class modify {
     public static void main(String[] args) {
-        String oldFolderPath="E:\\文档\\豆丁文档\\豆丁word";
-        String newFolderPath="E:\\文档\\豆丁文档\\word";
+        String oldFolderPath="E:\\文档\\test";
+        String newFolderPath="E:\\文档\\jieguo";
         //加载Word⽂档
         LinkedList fileList=GetDirectory(oldFolderPath);
         for (Object filePath:fileList){
@@ -19,12 +19,15 @@ public class modify {
             }
         }
     }
+
     public static void  modifyFile(String filePath,String oldFolderPath){
         File tmpFile=new File(filePath);
         String fileName=tmpFile.getName();
         String newFilePath=oldFolderPath+"\\"+fileName;
+        String newFilepathStr=replaceString( newFilePath);
         Document doc = new Document();
         doc.loadFromFile(filePath);
+        replaceContent(doc);
         //遍历⽂档中的节和段落，获取每个段落的⽂本
         int deleteNumber =-1;
         for(int i = 0; i < doc.getSections().getCount(); i++) {
@@ -43,8 +46,47 @@ public class modify {
             }
 
             //保存文档
-            doc.saveToFile(newFilePath, FileFormat.Docx_2013);
+            doc.saveToFile(newFilepathStr, FileFormat.Docx_2013);
+            tmpFile.delete();
         }
+    }
+    public static  void replaceContent(Document doc){
+        doc.replace("2005", "2023", false, true);
+        doc.replace("2006", "2023", false, true);
+        doc.replace("2007", "2023", false, true);
+        doc.replace("2008", "2023", false, true);
+        doc.replace("2009", "2023", false, true);
+        doc.replace("2010", "2023", false, true);
+        doc.replace("2011", "2023", false, true);
+        doc.replace("2012", "2023", false, true);
+        doc.replace("2013", "2023", false, true);
+        doc.replace("2014", "2023", false, true);
+        doc.replace("2015", "2023", false, true);
+        doc.replace("2016", "2023", false, true);
+        doc.replace("2017", "2023", false, true);
+        doc.replace("2018", "2023", false, true);
+        doc.replace("2019", "2023", false, true);
+        doc.replace("2020", "2023", false, true);
+        doc.replace("2021", "2023", false, true);
+        doc.replace("2022", "2023", false, true);
+    }
+    public static String replaceString(String newFilePath){
+        String newFilepathStr=newFilePath.replace("2007","2023")
+                .replace("2008","2023")
+                .replace("2009","2023")
+                .replace("2010","2023")
+                .replace("2011","2023")
+                .replace("2012","2023")
+                .replace("2013","2023")
+                .replace("2014","2023")
+                .replace("2015","2023")
+                .replace("2016","2023")
+                .replace("2017","2023")
+                .replace("2018","2023")
+                .replace("2019","2023")
+                .replace("2020","2023")
+                .replace("2021","2023");
+        return newFilepathStr;
     }
     public static LinkedList GetDirectory(String folderPath) {
 
