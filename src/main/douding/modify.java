@@ -85,7 +85,9 @@ public class modify {
                 .replace("2018","2023")
                 .replace("2019","2023")
                 .replace("2020","2023")
-                .replace("2021","2023");
+                .replace("2021","2023")
+                .replace("2022","2023")
+                .replace("...","");
         return newFilepathStr;
     }
     public static LinkedList GetDirectory(String folderPath) {
