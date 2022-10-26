@@ -5,50 +5,76 @@ import com.spire.doc.documents.Paragraph;
 import com.spire.doc.documents.ParagraphStyle;
 import com.spire.doc.fields.TextRange;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStreamReader;
+import java.util.*;
+
+import com.spire.doc.Document;
+import com.spire.doc.FileFormat;
+import com.spire.doc.Section;
+import com.spire.doc.documents.Paragraph;
+
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStreamReader;
+import java.util.ArrayList;
 import java.util.LinkedList;
+import java.util.List;
+
+import static jdk.nashorn.internal.objects.NativeString.length;
 
 public class test {
     public static void main(String[] args) {
-        Document document = new Document();
-        Section sec = document.addSection();
-        Document doc = new Document("E:\\文档\\jieguo\\2019.docx");
-        replaceContent( doc);
-////        LinkedList fileList=GetDirectory("E:\\文档\\豆丁文档\\豆丁word");
-////        File tmpFile=new File("E:\\文档\\豆丁文档\\豆丁word\\(完整版)公务员考试数学试题.docx");
-////        String fileName=tmpFile.getName();
-////        System.out.println(fileName);
-////        for (Object file:fileList){
-//////            System.out.println(file.toString());
-////        }
-//        //遍历⽂档中的节和段落，获取每个段落的⽂本
-//        int deleteNumber =-1;
-//        for(int i = 0; i < doc.getSections().getCount(); i++) {
-//            Section section = doc.getSections().get(i);
-//            for (int j = 0; j < section.getParagraphs().getCount(); j++) {
-//                Paragraph paragraph = section.getParagraphs().get(j);
-//                Paragraph paragraphw = sec.addParagraph();
-//                TextRange tr=paragraphw.appendText(paragraph.getText());
-//                tr.getCharacterFormat().setFontSize(20);
-//                ParagraphStyle style1 = new ParagraphStyle(document);
-////                style1.setName("style");
-//                style1.getCharacterFormat().setFontName("宋体");
-//                document.getStyles().add(style1);
-//                paragraphw.applyStyle(style1.getName());
-////                if (paragraph.getText().equals("点击加载更多")) {
-////                    deleteNumber=j;
-////                }
+       String content="sjfdgsgn";
+       int number=content.length();
+       System.out.println(number);
+    }
+
+    public static void modifyFile(String filePath, String oldFolderPath) {
+        File tmpFile = new File(filePath);
+        String fileName = tmpFile.getName();
+        String newFilePath = oldFolderPath + "\\" + fileName;
+        Document doc = new Document();
+        doc.loadFromFile(filePath);
+        replaceContent(doc);
+        //遍历⽂档中的节和段落，获取每个段落的⽂本
+        int deleteNumber = -1;
+        int deletePraNumber=-1;
+        for (int i = 0; i < doc.getSections().getCount(); i++) {
+            Section section = doc.getSections().get(i);
+            for (int j = 0; j < section.getParagraphs().getCount(); j++) {
+                Paragraph paragraph = section.getParagraphs().get(j);
+//                if (getPraJudge(paragraph.getText(), praBelowkeyPath)){
+//                    deleteNumber = j;
+//                    break;
+//                }
+//                if (getPraJudge(paragraph.getText(), praDeletekeyPath)){
+//                    deletePraNumber = j;
+//                    break;
+//                }
+            }
+            int praNumber=0;
+            int[] numberList= {1,3,5};
+            for (int number:numberList){
+                System.out.println(section.getParagraphs().getCount());
+                //删除第一节的第a段
+                section.getParagraphs().removeAt(number-praNumber);
+                praNumber++;
+            }
+//            if (true) {
+//                for (int a = 0; a < section.getParagraphs().getCount();) {
+//
+//                }
 //            }
-////            if (!(deleteNumber==-1)){
-////                for (int a = deleteNumber; a < section.getParagraphs().getCount(); ){
-////                    //删除第一节的第二段
-////                    section.getParagraphs().removeAt(a);
-////                }
-////            }
 
             //保存文档
-        doc.saveToFile("E:\\文档\\test\\!!!论图形创意在平面广告设计中的运用.docx", FileFormat.Docx);
+            doc.saveToFile(newFilePath, FileFormat.Docx_2013);
+            tmpFile.delete();
         }
+    }
 //    }
     public static  void replaceContent(Document doc){
         doc.replace("2005", "2023", false, true);
