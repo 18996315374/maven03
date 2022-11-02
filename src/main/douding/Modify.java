@@ -88,9 +88,13 @@ public class Modify {
     }
     //判断该内容是否以特殊符号结尾
     public static Boolean getpraLastJudge(String content){
+        String[] fuhaos={"。","！","；","……","","","",""};
         Boolean panduan = false;
         if (content.endsWith(":")){
             panduan=true;
+        }
+        if(content.startsWith("")){
+
         }
         return panduan;
     }

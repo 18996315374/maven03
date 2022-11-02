@@ -64,7 +64,9 @@ public class ModifyDocument {
                             String patternx = "#\\d+";
                             content=content.replaceAll(patternx,"");
                             Paragraph para = fillContent(sec, content);
-                            makeParagraphType(doc,para,content);
+                            if(para!=null){
+                                makeParagraphType(doc,para,content);
+                            }
                         }
                     }
                     if(bool && (docContent.length()>100)){
@@ -184,9 +186,15 @@ public class ModifyDocument {
 
     //给段落填充内容
     public static Paragraph fillContent(Section sec, String content) {
-        Paragraph para1 = sec.addParagraph();
-        TextRange textRange = para1.appendText(content);
-        return para1;
+        try {
+            Paragraph para1 = sec.addParagraph();
+            TextRange textRange = para1.appendText(content);
+            return para1;
+        }catch (Exception e) {
+            System.out.println(e);
+            return null;
+        }
+
     }
 
     //将第一段作为标题，设置标题格式
@@ -215,7 +223,7 @@ public class ModifyDocument {
         style1.getCharacterFormat().setBold(true);
         style1.getCharacterFormat().setTextColor(Color.BLUE);
         style1.getCharacterFormat().setFontName("宋体");
-        style1.getCharacterFormat().setFontSize(14f);
+        style1.getCharacterFormat().setFontSize(14.5f);
         doc.getStyles().add(style1);
         para1.applyStyle(paraStyleName);
         para1.getFormat().setBeforeSpacing(15f);
@@ -230,7 +238,7 @@ public class ModifyDocument {
         ParagraphStyle style2 = new ParagraphStyle(doc);
         style2.setName(paraStyleName);
         style2.getCharacterFormat().setFontName("宋体（正文）");
-        style2.getCharacterFormat().setFontSize(14f);
+        style2.getCharacterFormat().setFontSize(14.5f);
         doc.getStyles().add(style2);
         para1.applyStyle(paraStyleName);
         para1.getFormat().setBeforeSpacing(10f);
@@ -245,7 +253,7 @@ public class ModifyDocument {
         ParagraphStyle style2 = new ParagraphStyle(doc);
         style2.setName(paraStyleName);
         style2.getCharacterFormat().setFontName("宋体（正文）");
-        style2.getCharacterFormat().setFontSize(14f);
+        style2.getCharacterFormat().setFontSize(14.5f);
         doc.getStyles().add(style2);
         para1.applyStyle(paraStyleName);
         para1.getFormat().setFirstLineIndent(25f);
@@ -261,7 +269,7 @@ public class ModifyDocument {
         ParagraphStyle style2 = new ParagraphStyle(doc);
         style2.setName(paraStyleName);
         style2.getCharacterFormat().setFontName("宋体（正文）");
-        style2.getCharacterFormat().setFontSize(14f);
+        style2.getCharacterFormat().setFontSize(14.5f);
         doc.getStyles().add(style2);
         para1.applyStyle(paraStyleName);
         para1.getFormat().setFirstLineIndent(25f);
