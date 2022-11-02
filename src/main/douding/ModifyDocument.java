@@ -25,7 +25,10 @@ public class ModifyDocument {
 
         String folderPath = "D:\\文档\\百度活动文档\\中介";
         String newFolderPath="D:\\文档\\百度活动文档\\test2";
-        String failurePath="D:\\文档\\百度活动文档\\test4";
+        String failurePath="D:\\文档\\百度活动文档\\有问题文档";
+        setFileStyle(folderPath,newFolderPath,failurePath);
+    }
+    public static void setFileStyle(String folderPath,String newFolderPath,String failurePath) throws InterruptedException {
         LinkedList fileList = GetDirectory(folderPath);
         for (Object filePath : fileList) {
             Document doc = new Document();

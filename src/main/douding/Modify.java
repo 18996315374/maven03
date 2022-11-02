@@ -11,9 +11,7 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
-import static jdk.nashorn.internal.objects.NativeString.length;
-
-public class modify {
+public class Modify {
     static String praBelowkeyPath = "src/main/douding/praBelowkey.txt";
     static String praDeletekeyPath = "src/main/douding/praDeletekey.txt";
     static String replacePath = "src/main/douding/doc_replace.txt";
@@ -21,6 +19,9 @@ public class modify {
     public static void main(String[] args) {
         String oldFolderPath = "D:\\文档\\百度活动文档\\test";
         String newFolderPath = "D:\\文档\\百度活动文档\\test1";
+        setFileModify(oldFolderPath, newFolderPath);
+    }
+    public static void setFileModify(String oldFolderPath,String newFolderPath){
         //加载Word⽂档
         LinkedList fileList = GetDirectory(oldFolderPath);
         for (Object filePath : fileList) {
@@ -30,7 +31,6 @@ public class modify {
             }
         }
     }
-
     public static void modifyFile(String filePath, String oldFolderPath) {
         File tmpFile = new File(filePath);
         String fileName = tmpFile.getName();
