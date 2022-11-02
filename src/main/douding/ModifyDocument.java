@@ -23,7 +23,7 @@ public class ModifyDocument {
 
     public static void main(String[] args) throws InterruptedException, IOException {
 
-        String folderPath = "D:\\文档\\百度活动文档\\test1";
+        String folderPath = "D:\\文档\\百度活动文档\\中介";
         String newFolderPath="D:\\文档\\百度活动文档\\test2";
         String failurePath="D:\\文档\\百度活动文档\\test4";
         LinkedList fileList = GetDirectory(folderPath);
@@ -42,10 +42,12 @@ public class ModifyDocument {
                 //写入并设置其他段落
                 List<XWPFParagraph> paras = WordContent.gatParas(filePathx);
                 Boolean bool=true;
+                String docContent = "";
                 if (paras.size() != 0) {
                     for (int i = 0; i < paras.size(); i++) {
                         String content = paras.get(i).getText().trim();
-                        if(content.indexOf("⼯")!=-1){
+                        docContent=docContent+content;
+                        if((content.indexOf("⼯")!=-1)|| (content.indexOf("VIP")!=-1)){
                             bool=false;
                             break;
                         }
@@ -62,7 +64,7 @@ public class ModifyDocument {
                             makeParagraphType(doc,para,content);
                         }
                     }
-                    if(bool){
+                    if(bool && (docContent.length()>100)){
                         doc.saveToFile(newFolderPath+"\\"+fileName);
                         doc.dispose();
                         if(file.delete()){
@@ -117,7 +119,7 @@ public class ModifyDocument {
     //判断该段是否是信件的尊称
     public static Boolean getBooleanByMail(String content){
         Boolean puanduan=false;
-        String[] mailKeys={"尊敬的","亲爱的","各位","朋友"};
+        String[] mailKeys={"尊敬的","亲爱的","各位","朋友","老师","同学"};
         if(content.endsWith("：") && content.length()<12){
             for (String mailKey:
             mailKeys) {
@@ -131,7 +133,7 @@ public class ModifyDocument {
     //判断该段是否是小标题
     public static Boolean getBooleanBylittleTitle(String content){
         Boolean puanduan=false;
-        String[] startKeys= {"第1篇","第2篇","第3篇","第4篇","第5篇","第6篇","第7篇","第8篇","第9篇","第10篇",};
+        String[] startKeys= {"第1篇","第2篇","第3篇","第4篇","第5篇","第6篇","第7篇","第8篇","第9篇","第10篇","篇1","篇2","篇3","篇4","篇5","篇6","篇7","篇8","篇9","篇10"};
         String[] endKeys={"第1篇","第2篇","第3篇","第4篇","第5篇","第6篇","第7篇","第8篇","第9篇","第10篇",
                 "一：","二：","三：","四：","五：","六：","七：","八：","九：","十：","（一）","（二）","（三）",
                 "（四）","（五）","（六）","（七）","（八）","（九）","（十）","(一)","(二)","(三)","(四)","(五)","(六)",
@@ -186,7 +188,7 @@ public class ModifyDocument {
 
     //将第一段作为标题，设置标题格式
     public static void firstParaStyle(Document doc, Paragraph para1) throws InterruptedException {
-        Thread.sleep(100);
+        Thread.sleep(1);
         String paraStyleName="paraStyle"+System.currentTimeMillis();
         ParagraphStyle style1 = new ParagraphStyle(doc);
         style1.setName(paraStyleName);
@@ -198,12 +200,12 @@ public class ModifyDocument {
         para1.applyStyle(paraStyleName);
         //设置第一个段落的对齐方式
         para1.getFormat().setHorizontalAlignment(HorizontalAlignment.Center);
-        para1.getFormat().setAfterSpacing(15f);
+        para1.getFormat().setAfterSpacing(20f);
     }
 
     //设置小标题格式
     public static void titleParaStyle(Document doc, Paragraph para1) throws InterruptedException {
-        Thread.sleep(100);
+        Thread.sleep(1);
         String paraStyleName="paraStyle"+System.currentTimeMillis();
         ParagraphStyle style1 = new ParagraphStyle(doc);
         style1.setName(paraStyleName);
@@ -213,12 +215,13 @@ public class ModifyDocument {
         style1.getCharacterFormat().setFontSize(14f);
         doc.getStyles().add(style1);
         para1.applyStyle(paraStyleName);
-        para1.getFormat().setAfterSpacing(10f);
+        para1.getFormat().setBeforeSpacing(15f);
         para1.getFormat().setAfterSpacing(15f);
+        para1.getFormat().setHorizontalAlignment(HorizontalAlignment.Center);
     }
     //设置信件格式
     public static void xinjianParaStyle(Document doc, Paragraph para1) throws InterruptedException {
-        Thread.sleep(100);
+        Thread.sleep(1);
         String paraStyleName="paraStyle"+System.currentTimeMillis();
         //设置其余两个段落的格式
         ParagraphStyle style2 = new ParagraphStyle(doc);
@@ -227,12 +230,13 @@ public class ModifyDocument {
         style2.getCharacterFormat().setFontSize(14f);
         doc.getStyles().add(style2);
         para1.applyStyle(paraStyleName);
-        para1.getFormat().setAfterSpacing(8f);
+        para1.getFormat().setBeforeSpacing(10f);
         para1.getFormat().setAfterSpacing(10f);
+        para1.getFormat().setFirstLineIndent(0f);
     }
     //设置order格式
     public static void orderParaStyle(Document doc, Paragraph para1) throws InterruptedException {
-        Thread.sleep(100);
+        Thread.sleep(1);
         String paraStyleName="paraStyle"+System.currentTimeMillis();
         //设置其余两个段落的格式
         ParagraphStyle style2 = new ParagraphStyle(doc);
@@ -242,13 +246,13 @@ public class ModifyDocument {
         doc.getStyles().add(style2);
         para1.applyStyle(paraStyleName);
         para1.getFormat().setFirstLineIndent(25f);
-        para1.getFormat().setAfterSpacing(8f);
+        para1.getFormat().setBeforeSpacing(10f);
         para1.getFormat().setAfterSpacing(10f);
     }
 
     //设置正文格式
     public static void otherParaStyle(Document doc, Paragraph para1) throws InterruptedException {
-        Thread.sleep(100);
+        Thread.sleep(1);
         String paraStyleName="paraStyle"+System.currentTimeMillis();
         //设置其余两个段落的格式
         ParagraphStyle style2 = new ParagraphStyle(doc);
@@ -258,7 +262,7 @@ public class ModifyDocument {
         doc.getStyles().add(style2);
         para1.applyStyle(paraStyleName);
         para1.getFormat().setFirstLineIndent(25f);
-        para1.getFormat().setAfterSpacing(8f);
+        para1.getFormat().setBeforeSpacing(10f);
         para1.getFormat().setAfterSpacing(10f);
     }
 
