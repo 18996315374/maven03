@@ -2,81 +2,133 @@ import com.spire.doc.Document;
 import com.spire.doc.FileFormat;
 import com.spire.doc.Section;
 import com.spire.doc.documents.Paragraph;
-import com.spire.doc.documents.ParagraphStyle;
-import com.spire.doc.fields.TextRange;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.InputStreamReader;
-import java.util.*;
-
-import com.spire.doc.Document;
-import com.spire.doc.FileFormat;
-import com.spire.doc.Section;
-import com.spire.doc.documents.Paragraph;
-
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.InputStreamReader;
+import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
 import static jdk.nashorn.internal.objects.NativeString.length;
 
 public class test {
-    public static void main(String[] args) {
-       String content="sjfdgsgn";
-       int number=content.length();
-       System.out.println(number);
-    }
+    static String praBelowkeyPath = "src/main/douding/praBelowkey.txt";
+    static String praDeletekeyPath = "src/main/douding/praDeletekey.txt";
+    static String replacePath = "src/main/douding/doc_replace.txt";
 
+    public static void main(String[] args) throws IOException {
+      Path fromFile = Paths.get("D:\\文档\\百度活动文档\\中介\\2021上海疫情防控工作总结.docx");
+//
+      Path toFile = Paths.get("D:\\文档\\百度活动文档\\test4\\2021上海疫情防控工作总结.docx");
+      Files.copy(fromFile, toFile);
+//————————————————
+
+    }
     public static void modifyFile(String filePath, String oldFolderPath) {
         File tmpFile = new File(filePath);
         String fileName = tmpFile.getName();
         String newFilePath = oldFolderPath + "\\" + fileName;
+//        String newFilepathStr = replaceString(newFilePath);
         Document doc = new Document();
         doc.loadFromFile(filePath);
-        replaceContent(doc);
+        replaceContent(doc, replacePath);
         //遍历⽂档中的节和段落，获取每个段落的⽂本
-        int deleteNumber = -1;
-        int deletePraNumber=-1;
         for (int i = 0; i < doc.getSections().getCount(); i++) {
+            String content="";
             Section section = doc.getSections().get(i);
+            int deleteNumber = -1;
             for (int j = 0; j < section.getParagraphs().getCount(); j++) {
                 Paragraph paragraph = section.getParagraphs().get(j);
-//                if (getPraJudge(paragraph.getText(), praBelowkeyPath)){
-//                    deleteNumber = j;
-//                    break;
-//                }
-//                if (getPraJudge(paragraph.getText(), praDeletekeyPath)){
-//                    deletePraNumber = j;
-//                    break;
-//                }
+                if (getPraJudge(paragraph.getText(), praBelowkeyPath) && (paragraph.getText().length() < 100)) {
+                    deleteNumber = j;
+                    break;
+                }
             }
-            int praNumber=0;
-            int[] numberList= {1,3,5};
-            for (int number:numberList){
+            if (!(deleteNumber == -1)) {
+                for (int a = deleteNumber; a < section.getParagraphs().getCount(); ) {
+                    //删除第一节的第a段
+                    section.getParagraphs().removeAt(a);
+                }
+            }
+            ArrayList<Integer> deletePraNumberList = new ArrayList<Integer>();
+            int praNumber = 0;
+            for (int j = 0; j < section.getParagraphs().getCount(); j++) {
+                Paragraph paragraph = section.getParagraphs().get(j);
+                content=content+paragraph.getText();
+                if (paragraph.getText().endsWith("(")){
+                    paragraph.setText(paragraph.getText().replace("(","( )"));
+                }
+                if (getPraJudge(paragraph.getText(), praDeletekeyPath)) {
+                    deletePraNumberList.add(j);
+                }
+                if ((j==section.getParagraphs().getCount()) && getpraLastJudge(paragraph.getText())){
+                    deletePraNumberList.add(j);
+                }
+                if((paragraph.getText().equals(")")) || (paragraph.getText().equals(")。")) ){
+                    deletePraNumberList.add(j);
+                }
+            }
+            for (int number : deletePraNumberList) {
                 System.out.println(section.getParagraphs().getCount());
                 //删除第一节的第a段
-                section.getParagraphs().removeAt(number-praNumber);
+                section.getParagraphs().removeAt(number - praNumber);
                 praNumber++;
             }
-//            if (true) {
-//                for (int a = 0; a < section.getParagraphs().getCount();) {
-//
-//                }
-//            }
-
             //保存文档
-            doc.saveToFile(newFilePath, FileFormat.Docx_2013);
-            tmpFile.delete();
+            System.out.println(content.length());
+            if (content.length()>100){
+                doc.saveToFile(newFilePath, FileFormat.Docx_2013);
+                tmpFile.delete();
+            }
         }
     }
-//    }
-    public static  void replaceContent(Document doc){
+    //判断该内容是否以特殊符号结尾
+    public static Boolean getpraLastJudge(String content){
+        Boolean panduan = false;
+        if (content.endsWith("：")){
+            panduan=true;
+        }
+        return panduan;
+    }
+    //判断该内容是否包含关键词
+    public static Boolean getPraJudge(String content, String praBelowkeyPath) {
+        Boolean panduan = false;
+        List keys = getPraBelowKeys(praBelowkeyPath);
+        for (Object key :
+                keys) {
+            String keyStr = key.toString();
+            if (content.indexOf(keyStr) != -1) {
+                panduan = true;
+                break;
+            }
+        }
+        return panduan;
+    }
+
+    //文档内容替换
+    public static void replaceContent(Document doc, String replacePath) {
+        List keys = getPraBelowKeys(replacePath);
+        for (Object key :
+                keys) {
+            String keyStr = key.toString();
+            String s = keyStr.split("===>")[0];
+            String content = keyStr.replace(s, "").replace("===>", "");
+            String value = "";
+            if (content.equals("")) {
+                value = "";
+            } else {
+                value = keyStr.split("===>")[1];
+            }
+            doc.replace(s, value, false, true);
+        }
+    }
+
+    //文档内容包含的年份替换
+    public static void replaceContentYear(Document doc) {
         doc.replace("2005", "2023", false, true);
         doc.replace("2006", "2023", false, true);
         doc.replace("2007", "2023", false, true);
@@ -96,9 +148,31 @@ public class test {
         doc.replace("2021", "2023", false, true);
         doc.replace("2022", "2023", false, true);
     }
-    public static LinkedList GetDirectory(String path) {
 
-        File file = new File(path);
+    public static String replaceString(String newFilePath) {
+        String newFilepathStr = newFilePath.replace("2007", "2023")
+                .replace("2008", "2023")
+                .replace("2009", "2023")
+                .replace("2010", "2023")
+                .replace("2011", "2023")
+                .replace("2012", "2023")
+                .replace("2013", "2023")
+                .replace("2014", "2023")
+                .replace("2015", "2023")
+                .replace("2016", "2023")
+                .replace("2017", "2023")
+                .replace("2018", "2023")
+                .replace("2019", "2023")
+                .replace("2020", "2023")
+                .replace("2021", "2023")
+                .replace("2022", "2023")
+                .replace("...", "");
+        return newFilepathStr;
+    }
+
+    public static LinkedList GetDirectory(String folderPath) {
+
+        File file = new File(folderPath);
 
         LinkedList Dirlist = new LinkedList(); // 保存待遍历文件夹的列表
 
@@ -160,4 +234,28 @@ public class test {
 
     }
 
+    //获取txt文件的每一行内容
+    public static ArrayList getPraBelowKeys(String praBelowkeyPath) {
+        ArrayList res = new ArrayList();
+        try {
+            File fileKey = new File(praBelowkeyPath);
+            String absolutePath = fileKey.getAbsolutePath();
+            File file = new File(praBelowkeyPath);
+            if (file.isFile() && file.exists()) { // 判断文件是否存在
+                InputStreamReader read = new InputStreamReader(new FileInputStream(file), "utf-8");// 编码格式必须和文件的一致
+                BufferedReader bufferedReader = new BufferedReader(read);
+                String lineTxt = null;
+                while ((lineTxt = bufferedReader.readLine()) != null) {
+//注意文件里面的格式，我的里面是一行一行的，所以不需要再次切割了，直接添加就行
+                    res.add(lineTxt);
+                }
+                read.close();
+            } else {
+                System.out.println("指定的文件不存在");
+            }
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+        return res;
+    }
 }

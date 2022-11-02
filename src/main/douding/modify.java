@@ -16,7 +16,7 @@ import static jdk.nashorn.internal.objects.NativeString.length;
 public class modify {
     static String praBelowkeyPath = "src/main/douding/praBelowkey.txt";
     static String praDeletekeyPath = "src/main/douding/praDeletekey.txt";
-    static String replacePath="src/main/douding/doc_replace.txt";
+    static String replacePath = "src/main/douding/doc_replace.txt";
 
     public static void main(String[] args) {
         String oldFolderPath = "D:\\文档\\百度活动文档\\test";
@@ -30,6 +30,7 @@ public class modify {
             }
         }
     }
+
     public static void modifyFile(String filePath, String oldFolderPath) {
         File tmpFile = new File(filePath);
         String fileName = tmpFile.getName();
@@ -37,48 +38,62 @@ public class modify {
 //        String newFilepathStr = replaceString(newFilePath);
         Document doc = new Document();
         doc.loadFromFile(filePath);
-        replaceContent(doc,replacePath);
-        System.out.println(doc.toString().length());
-        if (doc.toString().length() > 100){
-            //遍历⽂档中的节和段落，获取每个段落的⽂本
-            for (int i = 0; i < doc.getSections().getCount(); i++) {
-                Section section = doc.getSections().get(i);
-                int deleteNumber = -1;
-                for (int j = 0; j < section.getParagraphs().getCount(); j++) {
-                    Paragraph paragraph = section.getParagraphs().get(j);
-                    if (getPraJudge(paragraph.getText(), praBelowkeyPath) && (paragraph.getText().length() < 100)) {
-                        deleteNumber = j;
-                        break;
-                    }
+        replaceContent(doc, replacePath);
+        //遍历⽂档中的节和段落，获取每个段落的⽂本
+        for (int i = 0; i < doc.getSections().getCount(); i++) {
+            String content="";
+            Section section = doc.getSections().get(i);
+            int deleteNumber = -1;
+            for (int j = 0; j < section.getParagraphs().getCount(); j++) {
+                Paragraph paragraph = section.getParagraphs().get(j);
+                if (getPraJudge(paragraph.getText(), praBelowkeyPath) && (paragraph.getText().length() < 100)) {
+                    deleteNumber = j;
+                    break;
                 }
-                if (!(deleteNumber == -1)) {
-                    for (int a = deleteNumber; a < section.getParagraphs().getCount(); ) {
-                        //删除第一节的第a段
-                        section.getParagraphs().removeAt(a);
-                    }
-                }
-                ArrayList<Integer> deletePraNumberList = new ArrayList<Integer>();
-                int praNumber=0;
-                for (int j = 0; j < section.getParagraphs().getCount(); j++) {
-                    Paragraph paragraph = section.getParagraphs().get(j);
-                    if (getPraJudge(paragraph.getText(), praDeletekeyPath)) {
-                        deletePraNumberList.add(j);
-                    }
-                }
-                for (int number : deletePraNumberList) {
-                    System.out.println(section.getParagraphs().getCount());
+            }
+            if (!(deleteNumber == -1)) {
+                for (int a = deleteNumber; a < section.getParagraphs().getCount(); ) {
                     //删除第一节的第a段
-                    section.getParagraphs().removeAt(number - praNumber);
-                    praNumber++;
+                    section.getParagraphs().removeAt(a);
                 }
-                //保存文档
+            }
+            ArrayList<Integer> deletePraNumberList = new ArrayList<Integer>();
+            int praNumber = 0;
+            for (int j = 0; j < section.getParagraphs().getCount(); j++) {
+                Paragraph paragraph = section.getParagraphs().get(j);
+                content=content+paragraph.getText();
+                if (getPraJudge(paragraph.getText(), praDeletekeyPath)) {
+                    deletePraNumberList.add(j);
+                }
+                if ((j==section.getParagraphs().getCount()) && getpraLastJudge(paragraph.getText())){
+                    deletePraNumberList.add(j);
+                }
+                if(paragraph.getText().equals(")")){
+                    deletePraNumberList.add(j);
+                }
+            }
+            for (int number : deletePraNumberList) {
+                System.out.println(section.getParagraphs().getCount());
+                //删除第一节的第a段
+                section.getParagraphs().removeAt(number - praNumber);
+                praNumber++;
+            }
+            //保存文档
+            System.out.println(content.length());
+            if (content.length()>100){
                 doc.saveToFile(newFilePath, FileFormat.Docx_2013);
                 tmpFile.delete();
             }
         }
-
     }
-
+    //判断该内容是否以特殊符号结尾
+    public static Boolean getpraLastJudge(String content){
+        Boolean panduan = false;
+        if (content.endsWith(":")){
+            panduan=true;
+        }
+        return panduan;
+    }
     //判断该内容是否包含关键词
     public static Boolean getPraJudge(String content, String praBelowkeyPath) {
         Boolean panduan = false;
@@ -93,24 +108,25 @@ public class modify {
         }
         return panduan;
     }
+
     //文档内容替换
-    public static void replaceContent(Document doc,String replacePath){
+    public static void replaceContent(Document doc, String replacePath) {
         List keys = getPraBelowKeys(replacePath);
         for (Object key :
                 keys) {
             String keyStr = key.toString();
-            System.out.println(keyStr);
             String s = keyStr.split("===>")[0];
-            String content=keyStr.replace(s,"").replace("===>","");
-            String value ="";
-            if (content.equals("")){
-                value ="";
-            }else {
+            String content = keyStr.replace(s, "").replace("===>", "");
+            String value = "";
+            if (content.equals("")) {
+                value = "";
+            } else {
                 value = keyStr.split("===>")[1];
             }
             doc.replace(s, value, false, true);
         }
     }
+
     //文档内容包含的年份替换
     public static void replaceContentYear(Document doc) {
         doc.replace("2005", "2023", false, true);

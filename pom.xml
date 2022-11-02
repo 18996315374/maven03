@@ -11,7 +11,7 @@
         <repository>
             <id>com.e-iceblue</id>
             <name>e-iceblue</name>
-            <url>https://repo.e-iceblue.cn/repository/maven-public/</url>
+            <url>/repository/maven-public/</url>
         </repository>
     </repositories>
     <dependencies>
